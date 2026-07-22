@@ -3,230 +3,251 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CODM Cash Tournaments</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    body {
-      background-color: #0b0f19;
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      padding: 20px 10px;
-      min-height: 100vh;
-    }
-    .container {
-      width: 100%;
-      max-width: 480px;
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      font-size: 1.25rem;
-      color: #f3f4f6;
-    }
-    .login-btn {
-      background: #1f2937;
-      color: #10b981;
-      border: 1px solid #10b981;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-    .section-title {
-      font-size: 0.85rem;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-    }
-    .match-card {
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .match-card.selected {
-      border-color: #10b981;
-      background: #112229;
-    }
-    .match-info h3 {
-      font-size: 1rem;
-      color: #f9fafb;
-    }
-    .match-info p {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-    .match-fee {
-      text-align: right;
-    }
-    .fee-badge {
-      background: #064e3b;
-      color: #34d399;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .form-group {
-      margin-bottom: 14px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-bottom: 6px;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .form-group input:focus {
-      border-color: #10b981;
-    }
-    .pay-btn {
-      width: 100%;
-      background: #10b981;
-      color: #000;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
-    }
-    .pay-btn:hover {
-      background: #059669;
-    }
-  </style>
+  <title>CODM Cash Match Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Paystack Inline JS -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
-<body>
+<body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-4">
 
-  <div class="container">
-    <!-- Header with Title & Login -->
-    <div class="header">
+  <div class="max-w-lg w-full bg-gray-900 rounded-2xl p-6 border border-gray-800 shadow-2xl">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
       <div>
-        <h1>CODM Cash Tournaments</h1>
-        <p style="font-size: 0.75rem; color: #6b7280;">24/7 Match Registration</p>
+        <h1 class="text-xl font-extrabold text-yellow-400">CODM Cash Tournaments</h1>
+        <p class="text-xs text-gray-400">8-Player "Winner-Takes-All"</p>
       </div>
-      <button class="login-btn" onclick="alert('Player Login feature coming soon!')">Player Login</button>
-    </div>
-
-    <!-- Match Options -->
-    <div class="section-title">1. Select Available Match Mode</div>
-    <div class="match-card selected">
-      <div class="match-info">
-        <h3>Gunfight Challenge</h3>
-        <p>MP 2v2 | Winner takes all</p>
-      </div>
-      <div class="match-fee">
-        <span class="fee-badge">₦1,000</span>
+      <div class="text-right">
+        <p class="text-xs text-gray-400">Host Status</p>
+        <p class="text-xs font-bold text-green-400 flex items-center gap-1 justify-end">
+          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> ONLINE
+        </p>
       </div>
     </div>
 
-    <div class="match-card">
-      <div class="match-info">
-        <h3>Sniper Challenge</h3>
-        <p>1v1 | Kill limit: 20</p>
-      </div>
-      <div class="match-fee">
-        <span class="fee-badge">₦1,000</span>
-      </div>
-    </div>
+    <!-- REGISTRATION FORM -->
+    <form id="match-form" onsubmit="handlePayment(event)" class="space-y-5">
+      
+      <!-- 1. MATCH MODE SELECTOR -->
+      <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3">
+        <p class="text-xs font-bold text-yellow-400 uppercase tracking-wider">1. Select Available Match Mode</p>
+        
+        <div class="grid grid-cols-1 gap-2.5" id="match-modes-container">
+          
+          <!-- Shotgun Challenge Card -->
+          <label id="card-shotgun" class="flex items-center justify-between p-3.5 bg-gray-800 rounded-xl border border-gray-700 cursor-pointer transition hover:border-yellow-400">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="match_mode" value="Shotgun Challenge" checked onclick="selectMode('Shotgun Challenge', 1000, 6400)" class="accent-yellow-400">
+              <div>
+                <p class="text-xs font-bold text-white">Shotgun Challenge</p>
+                <p class="text-[10px] text-gray-400">BY15 / KRM / HS0405 only</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-extrabold text-green-400">₦1,000</span>
+              <p class="text-[9px] text-gray-500">Win: ₦6,400</p>
+            </div>
+          </label>
 
-    <!-- Player Details Form -->
-    <div class="section-title" style="margin-top: 20px;">2. Player Info</div>
-    <form id="paymentForm">
-      <div class="form-group">
-        <label>CODM In-Game Name (IGN)</label>
-        <input type="text" id="gamerTag" placeholder="e.g. Ghost_007" required>
+          <!-- Sniper Challenge Card -->
+          <label id="card-sniper" class="flex items-center justify-between p-3.5 bg-gray-800 rounded-xl border border-gray-700 cursor-pointer transition hover:border-yellow-400">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="match_mode" value="Sniper Challenge" onclick="selectMode('Sniper Challenge', 1000, 6400)" class="accent-yellow-400">
+              <div>
+                <p class="text-xs font-bold text-white">Sniper Challenge</p>
+                <p class="text-[10px] text-gray-400">DL Q33 / Locus / Koshka</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-extrabold text-green-400">₦1,000</span>
+              <p class="text-[9px] text-gray-500">Win: ₦6,400</p>
+            </div>
+          </label>
+
+          <!-- Assault Challenge Card -->
+          <label id="card-assault" class="flex items-center justify-between p-3.5 bg-gray-800 rounded-xl border border-gray-700 cursor-pointer transition hover:border-yellow-400">
+            <div class="flex items-center gap-3">
+              <input type="radio" name="match_mode" value="Assault Challenge" onclick="selectMode('Assault Challenge', 1000, 6400)" class="accent-yellow-400">
+              <div>
+                <p class="text-xs font-bold text-white">Assault Challenge</p>
+                <p class="text-[10px] text-gray-400">AK117 / Grau / M13</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-extrabold text-green-400">₦1,000</span>
+              <p class="text-[9px] text-gray-500">Win: ₦6,400</p>
+            </div>
+          </label>
+
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>CODM Character UID</label>
-        <input type="text" id="uid" placeholder="e.g. 6748392019283741" required>
+      <!-- 2. PLAYER DETAILS -->
+      <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3">
+        <p class="text-xs font-bold text-yellow-400 uppercase tracking-wider">2. Player Info</p>
+        
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">CODM In-Game Name (IGN)</label>
+          <input type="text" id="ign" required placeholder="e.g. Ghost_007" 
+                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm focus:outline-none focus:border-yellow-400">
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">CODM Character UID</label>
+          <input type="text" id="uid" required placeholder="e.g. 6749302198420192831" 
+                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm font-mono focus:outline-none focus:border-yellow-400">
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Email Address</label>
+          <input type="email" id="email" required placeholder="player@gmail.com" 
+                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm focus:outline-none focus:border-yellow-400">
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="email" placeholder="player@gmail.com" required>
+      <!-- 3. PAYOUT DETAILS -->
+      <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3">
+        <p class="text-xs font-bold text-green-400 uppercase tracking-wider">3. Payout Details (If You Win)</p>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Select Bank</label>
+          <select id="bank-name" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm focus:outline-none focus:border-yellow-400 text-gray-200">
+            <option value="">-- Choose Bank --</option>
+            <option value="OPay">OPay Digital Services</option>
+            <option value="Kuda">Kuda Microfinance Bank</option>
+            <option value="Palmpay">PalmPay</option>
+            <option value="Moniepoint">Moniepoint MFB</option>
+            <option value="GTBank">Guaranty Trust Bank</option>
+            <option value="FirstBank">First Bank of Nigeria</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Account Number</label>
+          <input type="text" id="account-number" required maxlength="10" placeholder="7012345678" 
+                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm font-mono focus:outline-none focus:border-yellow-400">
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Account Name</label>
+          <input type="text" id="account-name" required placeholder="Account holder full name" 
+                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-sm focus:outline-none focus:border-yellow-400">
+        </div>
       </div>
 
-      <button type="submit" class="pay-btn">Pay ₦1,000 to Register</button>
+      <button type="submit" id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3.5 rounded-xl transition shadow-lg shadow-yellow-500/10">
+        Pay ₦1,000 & Join Match
+      </button>
     </form>
+
+    <!-- WAITING LOBBY -->
+    <div id="waiting-room" class="hidden text-center py-6 space-y-4">
+      <div class="inline-flex items-center gap-2 bg-green-500/10 text-green-400 text-xs px-3 py-1.5 rounded-full font-semibold border border-green-500/20">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+        MATCH ENTRY CONFIRMED
+      </div>
+      
+      <div class="bg-gray-800/60 p-4 rounded-xl border border-gray-800 text-left space-y-1 text-xs">
+        <p class="text-gray-400">Selected Mode: <span id="display-mode" class="text-yellow-400 font-bold"></span></p>
+        <p class="text-gray-400">Player IGN: <span id="display-ign" class="text-white font-bold"></span></p>
+        <p class="text-gray-400">Payout Account: <span id="display-payout" class="text-green-400 font-mono"></span></p>
+      </div>
+
+      <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
+        <p class="text-sm text-yellow-400 font-mono animate-pulse">Waiting for host to post Room ID & Password...</p>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Paystack Inline SDK -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
   <script>
-    const paymentForm = document.getElementById('paymentForm');
+    // =======================================================
+    // ⚙️ HOST MATCH CONTROLLER (Turn modes ON or OFF here!)
+    // =======================================================
+    const ACTIVE_MATCHES = {
+      shotgun: true,  // true = OPEN for entry | false = CLOSED
+      sniper: false,  // true = OPEN for entry | false = CLOSED
+      assault: false  // true = OPEN for entry | false = CLOSED
+    };
 
-    paymentForm.addEventListener("submit", function(e) {
+    let selectedMatchMode = "Shotgun Challenge";
+    let currentFee = 1000;
+
+    // Run when page loads to lock/unlock mode cards
+    window.onload = function() {
+      applyMatchStatus('card-shotgun', ACTIVE_MATCHES.shotgun);
+      applyMatchStatus('card-sniper', ACTIVE_MATCHES.sniper);
+      applyMatchStatus('card-assault', ACTIVE_MATCHES.assault);
+    };
+
+    function applyMatchStatus(cardId, isOpen) {
+      const card = document.getElementById(cardId);
+      const radio = card.querySelector('input[type="radio"]');
+
+      if (!isOpen) {
+        card.classList.add('opacity-40', 'pointer-events-none', 'bg-gray-900');
+        card.classList.remove('hover:border-yellow-400');
+        radio.disabled = true;
+        radio.checked = false;
+        
+        // Add "CLOSED" label
+        const statusTag = document.createElement('span');
+        statusTag.className = "text-[10px] font-bold text-red-500 uppercase border border-red-500/30 bg-red-500/10 px-2 py-0.5 rounded";
+        statusTag.innerText = "CLOSED";
+        card.querySelector('.text-right').appendChild(statusTag);
+      }
+    }
+
+    function selectMode(modeName, fee, prize) {
+      selectedMatchMode = modeName;
+      currentFee = fee;
+      document.getElementById('pay-btn').innerText = `Pay ₦${fee.toLocaleString()} & Join ${modeName}`;
+    }
+
+    function handlePayment(e) {
       e.preventDefault();
-
-      const email = document.getElementById('email').value;
-      const gamerTag = document.getElementById('gamerTag').value;
-      const uid = document.getElementById('uid').value;
+      
+      const ign = document.getElementById('ign').value.trim();
+      const uid = document.getElementById('uid').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const bank = document.getElementById('bank-name').value;
+      const accNum = document.getElementById('account-number').value.trim();
+      const accName = document.getElementById('account-name').value.trim();
 
       let handler = PaystackPop.setup({
-        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36', // Replace with your live key when ready
+        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36', // Plugs in your Paystack key directly
         email: email,
-        amount: 100000, // ₦1,000 in kobo
-        currency: 'NGN',
+        amount: currentFee * 100, // Converts Naira to Kobo
+        currency: "NGN",
         ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
         metadata: {
           custom_fields: [
-            {
-              display_name: "Gamer Tag",
-              variable_name: "gamer_tag",
-              value: gamerTag
-            },
-            {
-              display_name: "Character UID",
-              variable_name: "character_uid",
-              value: uid
-            }
+            { display_name: "Match Mode", variable_name: "match_mode", value: selectedMatchMode },
+            { display_name: "IGN", variable_name: "ign", value: ign },
+            { display_name: "CODM UID", variable_name: "uid", value: uid },
+            { display_name: "Payout Bank", variable_name: "payout_bank", value: bank },
+            { display_name: "Account Number", variable_name: "account_number", value: accNum },
+            { display_name: "Account Name", variable_name: "account_name", value: accName }
           ]
         },
-        onClose: function() {
-          alert('Window closed.');
-        },
         callback: function(response) {
-          alert('Payment Successful! Reference: ' + response.reference);
+          // Hide registration form and show waiting lobby
+          document.getElementById('match-form').classList.add('hidden');
+          document.getElementById('waiting-room').classList.remove('hidden');
+          
+          document.getElementById('display-mode').innerText = selectedMatchMode;
+          document.getElementById('display-ign').innerText = ign;
+          document.getElementById('display-payout').innerText = `${accNum} (${bank}) - ${accName}`;
+        },
+        onClose: function() {
+          alert('Transaction was not completed.');
         }
       });
-
+      
       handler.openIframe();
-    });
+    }
   </script>
 </body>
 </html>
