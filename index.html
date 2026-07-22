@@ -3,86 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CODM Tournament Registration</title>
-  
-  <!-- Paystack Inline SDK -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-
+  <title>CODM Cash Tournaments</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
+      background-color: #0b0f19;
       color: #ffffff;
       display: flex;
       justify-content: center;
+      padding: 20px 10px;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      margin-bottom: 20px;
     }
-    .card {
-      background: #1e1e1e;
-      padding: 25px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      text-align: center;
+    .header h1 {
+      font-size: 1.25rem;
+      color: #f3f4f6;
     }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #333;
-      background: #2b2b2b;
-      color: #fff;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #00c853;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 5px;
+    .login-btn {
+      background: #1f2937;
+      color: #10b981;
+      border: 1px solid #10b981;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
       cursor: pointer;
-      font-size: 16px;
-      margin-top: 10px;
     }
-    button:hover {
-      background-color: #00e676;
+    .section-title {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .match-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .match-card.selected {
+      border-color: #10b981;
+      background: #112229;
+    }
+    .match-info h3 {
+      font-size: 1rem;
+      color: #f9fafb;
+    }
+    .match-info p {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .match-fee {
+      text-align: right;
+    }
+    .fee-badge {
+      background: #064e3b;
+      color: #34d399;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: #10b981;
+    }
+    .pay-btn {
+      width: 100%;
+      background: #10b981;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .pay-btn:hover {
+      background: #059669;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>CODM Match Entry</h2>
-    <p>Entry Fee: <strong>₦1,000</strong></p>
+  <div class="container">
+    <!-- Header with Title & Login -->
+    <div class="header">
+      <div>
+        <h1>CODM Cash Tournaments</h1>
+        <p style="font-size: 0.75rem; color: #6b7280;">24/7 Match Registration</p>
+      </div>
+      <button class="login-btn" onclick="alert('Player Login feature coming soon!')">Player Login</button>
+    </div>
 
-    <!-- Player Inputs -->
-    <input type="text" id="gamerTag" placeholder="CODM Gamer Tag / Name" required />
-    <input type="email" id="email-address" placeholder="Email Address" required />
+    <!-- Match Options -->
+    <div class="section-title">1. Select Available Match Mode</div>
+    <div class="match-card selected">
+      <div class="match-info">
+        <h3>Gunfight Challenge</h3>
+        <p>MP 2v2 | Winner takes all</p>
+      </div>
+      <div class="match-fee">
+        <span class="fee-badge">₦1,000</span>
+      </div>
+    </div>
 
-    <!-- Pay Button -->
-    <button type="button" onclick="payWithPaystack()">Pay ₦1,000 to Register</button>
+    <div class="match-card">
+      <div class="match-info">
+        <h3>Sniper Challenge</h3>
+        <p>1v1 | Kill limit: 20</p>
+      </div>
+      <div class="match-fee">
+        <span class="fee-badge">₦1,000</span>
+      </div>
+    </div>
+
+    <!-- Player Details Form -->
+    <div class="section-title" style="margin-top: 20px;">2. Player Info</div>
+    <form id="paymentForm">
+      <div class="form-group">
+        <label>CODM In-Game Name (IGN)</label>
+        <input type="text" id="gamerTag" placeholder="e.g. Ghost_007" required>
+      </div>
+
+      <div class="form-group">
+        <label>CODM Character UID</label>
+        <input type="text" id="uid" placeholder="e.g. 6748392019283741" required>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="player@gmail.com" required>
+      </div>
+
+      <button type="submit" class="pay-btn">Pay ₦1,000 to Register</button>
+    </form>
   </div>
 
+  <!-- Paystack Inline SDK -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
   <script>
-    function payWithPaystack() {
-      const email = document.getElementById("email-address").value;
-      const gamerTag = document.getElementById("gamerTag").value;
+    const paymentForm = document.getElementById('paymentForm');
 
-      if (!email || !gamerTag) {
-        alert("Please enter both your Gamer Tag and Email Address.");
-        return;
-      }
+    paymentForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const gamerTag = document.getElementById('gamerTag').value;
+      const uid = document.getElementById('uid').value;
 
       let handler = PaystackPop.setup({
-        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36',
+        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36', // Replace with your live key when ready
         email: email,
-        amount: 100000,
+        amount: 100000, // ₦1,000 in kobo
         currency: 'NGN',
         ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
         metadata: {
@@ -91,11 +209,16 @@
               display_name: "Gamer Tag",
               variable_name: "gamer_tag",
               value: gamerTag
+            },
+            {
+              display_name: "Character UID",
+              variable_name: "character_uid",
+              value: uid
             }
           ]
         },
         onClose: function() {
-          alert('Transaction cancelled.');
+          alert('Window closed.');
         },
         callback: function(response) {
           alert('Payment Successful! Reference: ' + response.reference);
@@ -103,9 +226,8 @@
       });
 
       handler.openIframe();
-    }
+    });
   </script>
-
 </body>
 </html>
 
