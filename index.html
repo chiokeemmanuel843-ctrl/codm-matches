@@ -219,36 +219,55 @@
       let handler = PaystackPop.setup({
         key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36', // Plugs in your Paystack key directly
         email: email,
-        amount: currentFee * 100, // Converts Naira to Kobo
-        currency: "NGN",
-        ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
-        metadata: {
-          custom_fields: [
-            { display_name: "Match Mode", variable_name: "match_mode", value: selectedMatchMode },
-            { display_name: "IGN", variable_name: "ign", value: ign },
-            { display_name: "CODM UID", variable_name: "uid", value: uid },
-            { display_name: "Payout Bank", variable_name: "payout_bank", value: bank },
-            { display_name: "Account Number", variable_name: "account_number", value: accNum },
-            { display_name: "Account Name", variable_name: "account_name", value: accName }
-          ]
-        },
-        callback: function(response) {
-          // Hide registration form and show waiting lobby
-          document.getElementById('match-form').classList.add('hidden');
-          document.getElementById('waiting-room').classList.remove('hidden');
-          
-          document.getElementById('display-mode').innerText = selectedMatchMode;
-          document.getElementById('display-ign').innerText = ign;
-          document.getElementById('display-payout').innerText = `${accNum} (${bank}) - ${accName}`;
-        },
-        onClose: function() {
-          alert('Transaction was not completed.');
+            amount: currentFee * 100, // Converts Naira to Kobo
+    currency: "NGN",
+    ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
+    metadata: {
+      custom_fields: [
+        { display_name: "Match Mode", variable_name: "match_mode" },
+        { display_name: "IGN", variable_name: "ign" },
+        { display_name: "CODM UID", variable_name: "codm_uid" },
+        { display_name: "Payout Bank", variable_name: "payout_bank" },
+        { display_name: "Account Number", variable_name: "account_number" },
+        { display_name: "Account Name", variable_name: "account_name" }
+      ]
+    },
+    callback: function(response) {
+      // 1. Get database instance
+      const database = firebase.database();
+      
+      // 2. Save player registration details to Firebase
+      database.ref('registrations/' + response.reference).set({
+        reference: response.reference,
+        status: "Paid",
+        timestamp: new Date().toISOString()
+      }, function(error) {
+        if (error) {
+          alert("Database save failed: " + error.message);
+        } else {
+          // 3. Hide registration form and show waiting room
+          document.getElementById('match-form').style.display = 'none';
+          document.getElementById('waiting-room').style.display = 'block';
+
+          if (document.getElementById('display-mode')) {
+            document.getElementById('display-mode').innerText = "Registered";
+          }
+          if (document.getElementById('display-ign')) {
+            document.getElementById('display-ign').innerText = "Saved to Database";
+          }
+          if (document.getElementById('display-payout')) {
+            document.getElementById('display-payout').innerText = response.reference;
+          }
         }
       });
-      
-      handler.openIframe();
+    },
+    onClose: function() {
+      alert('Transaction was not completed.');
     }
-  </script>
+  });
+
+  handler.openIframe();
+}
+</script>
 </body>
 </html>
-
