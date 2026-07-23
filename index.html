@@ -281,10 +281,30 @@
 
     // Run when page loads to lock/unlock mode cards
     window.onload = function() {
-      applyMatchStatus('card-shotgun', ACTIVE_MATCHES.shotgun);
-      applyMatchStatus('card-sniper', ACTIVE_MATCHES.sniper);
-      applyMatchStatus('card-assault', ACTIVE_MATCHES.assault);
-    };
+  applyMatchStatus('card-shotgun', ACTIVE_MATCHES.shotgun);
+  applyMatchStatus('card-sniper', ACTIVE_MATCHES.sniper);
+  applyMatchStatus('card-assault', ACTIVE_MATCHES.assault);
+
+  // Restore player session if page is refreshed
+  const savedGroup = localStorage.getItem('assignedGroup');
+  const savedIgn = localStorage.getItem('playerIgn');
+  const savedMode = localStorage.getItem('selectedMode');
+
+  if (savedGroup) {
+    // Hide registration form and show waiting room
+    document.getElementById('match-form').classList.add('hidden');
+    document.getElementById('waiting-room').classList.remove('hidden');
+
+    if (savedIgn) document.getElementById('display-ign').innerText = savedIgn;
+    if (savedMode) document.getElementById('display-mode').innerText = savedMode;
+    document.getElementById('display-group').innerText = savedGroup;
+
+    // Reattach live listeners automatically
+    listenForGroupRoom(savedGroup);
+    listenForGroupPlayerCount(savedGroup);
+  }
+};
+    
 
     function applyMatchStatus(cardId, isOpen) {
       const card = document.getElementById(cardId);
@@ -361,6 +381,10 @@
         });
 
         // 4. Reveal waiting room UI
+        localStorage.setItem('assignedGroup', assignedGroup);
+        localStorage.setItem('playerIgn', ign);
+        localStorage.setItem('selectedMode', selectedMatchMode);
+        
         document.getElementById('match-form').classList.add('hidden');
         document.getElementById('waiting-room').classList.remove('hidden');
 
