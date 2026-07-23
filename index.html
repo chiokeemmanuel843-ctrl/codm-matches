@@ -4,13 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CODM Cash Match Portal</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Paystack Inline JS -->
   <script src="https://js.paystack.co/v1/inline.js"></script>
 
   <!-- Firebase App (Compat) & Realtime Database SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Mobile Console Debugger (Eruda) -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-4">
 
@@ -140,6 +147,7 @@
         </div>
       </div>
 
+      <!-- Submit Button -->
       <button type="submit" id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3.5 rounded-xl transition shadow-lg shadow-yellow-500/10">
         Pay ₦1,000 & Join Match
       </button>
@@ -158,7 +166,7 @@
         <p class="text-gray-400">Payout Account: <span id="display-payout" class="text-green-400 font-mono"></span></p>
       </div>
 
-      <!-- CODM CREDENTIALS BOX (DIRECT MATCH TO YOUR DESIGN) -->
+      <!-- CODM CREDENTIALS BOX -->
       <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
         <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
         
@@ -173,10 +181,9 @@
   <script>
     // =======================================================
     // ⚙️ FIREBASE INITIALIZATION
-    // Replace with your keys from Firebase Console Project Settings
     // =======================================================
     const firebaseConfig = {
-      databaseURL: "https://codm-tournaments-default-rtdb.firebaseio.com" // Update if your RTDB URL differs
+      databaseURL: "https://codm-tournaments-default-rtdb.firebaseio.com"
     };
     firebase.initializeApp(firebaseConfig);
 
