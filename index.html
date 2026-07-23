@@ -192,20 +192,27 @@
     // =======================================================
     // 📡 REALTIME CREDENTIALS LISTENER
     // =======================================================
-    firebase.database().ref('current_room').on('value', (snapshot) => {
-      const data = snapshot.val();
-      const displayArea = document.getElementById('room-credentials-display');
+    function listenForGroupRoom(assignedGroup) {
+  firebase.database().ref('rooms/' + assignedGroup).on('value', (snapshot) => {
+    const data = snapshot.val();
+    const displayArea = document.getElementById('room-credentials-display');
 
-      if (data && data.roomId && data.password) {
-        displayArea.innerHTML = `
-          <div class="space-y-1 mt-1">
-            <p class="text-xs font-bold text-green-400 uppercase tracking-wide mb-2">● Room Created</p>
-            <p class="text-yellow-400 font-mono text-base">Room ID: <span class="font-bold text-white select-all">${data.roomId}</span></p>
-            <p class="text-yellow-400 font-mono text-base">Password: <span class="font-bold text-white select-all">${data.password}</span></p>
-          </div>
-        `;
-      }
-    });
+    if (!displayArea) return;
+
+    if (data && data.roomId && data.password) {
+      displayArea.innerHTML = `
+        <div class="space-y-1 mt-1">
+          <p class="text-xs font-bold text-green-400 uppercase tracking-wider">${assignedGroup} Credentials Active</p>
+          <p class="text-yellow-400 font-mono text-base">Room ID: <span class="font-bold text-white select-all">${data.roomId}</span></p>
+          <p class="text-yellow-400 font-mono text-base">Password: <span class="font-bold text-white select-all">${data.password}</span></p>
+        </div>
+      `;
+    } else {
+      displayArea.innerHTML = `<p class="text-gray-400 text-sm animate-pulse">Waiting for host to post Room ID & Password for ${assignedGroup}...</p>`;
+    }
+  });
+    }
+    
 
     // =======================================================
     // ⚙️ HOST MATCH CONTROLLER (Turn modes ON or OFF here!)
@@ -308,7 +315,9 @@
         document.getElementById('display-ign').innerText = ign;
         document.getElementById('display-payout').innerText = `${bank} - ${accNum} (${accName})`;
         document.getElementById('display-group').innerText = assignedGroup;
-      },
+        listenForGroupRoom(assignedGroup);
+    
+       },
       onClose: function() {
         alert('Transaction was not completed.');
       }
