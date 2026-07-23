@@ -167,7 +167,27 @@
         <p class="text-gray-400">Assigned Group: <span id="display-group" class="text-yellow-400 font-bold">Group 1</span></p>
         </div>
     
+        <!-- LIVE 8-PLAYER GROUP COUNTER -->
+<div class="bg-gray-800/60 border border-gray-700/60 rounded-xl p-4 my-4 shadow-inner">
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Group Progress</span>
+    <span id="player-count-text" class="text-xs font-bold text-yellow-400">0 / 8 Players Joined</span>
+  </div>
+  
+  <!-- Animated Progress Bar Container -->
+  <div class="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden">
+    <div 
+      id="player-progress-bar" 
+      class="bg-gradient-to-r from-yellow-500 to-green-400 h-2.5 rounded-full transition-all duration-500 ease-out" 
+      style="width: 0%"
+    ></div>
+  </div>
 
+  <p id="group-status-msg" class="text-[11px] text-gray-400 mt-2 text-center">
+    Syncing group slots...
+  </p>
+</div>
+      
       <!-- CODM CREDENTIALS BOX -->
       <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
         <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
@@ -209,6 +229,39 @@
       `;
     } else {
       displayArea.innerHTML = `<p class="text-gray-400 text-sm animate-pulse">Waiting for host to post Room ID & Password for ${assignedGroup}...</p>`;
+    }
+  });
+    }
+    function listenForGroupPlayerCount(assignedGroup) {
+  const playersRef = firebase.database().ref('players');
+
+  playersRef.on('value', (snapshot) => {
+    let groupPlayerCount = 0;
+
+    snapshot.forEach((childSnapshot) => {
+      const playerData = childSnapshot.val();
+      if (playerData && playerData.assignedGroup === assignedGroup) {
+        groupPlayerCount++;
+      }
+    });
+
+    const countText = document.getElementById('player-count-text');
+    const progressBar = document.getElementById('player-progress-bar');
+    const statusMsg = document.getElementById('group-status-msg');
+
+    const currentCount = Math.min(groupPlayerCount, 8);
+    const percentage = (currentCount / 8) * 100;
+
+    if (countText) countText.innerText = `${currentCount} / 8 Players Joined`;
+    if (progressBar) progressBar.style.width = `${percentage}%`;
+
+    if (statusMsg) {
+      if (currentCount >= 8) {
+        statusMsg.innerHTML = `<span class="text-green-400 font-bold">🔥 Group Full! Match starting shortly.</span>`;
+      } else {
+        const remaining = 8 - currentCount;
+        statusMsg.innerText = `Waiting for ${remaining} more player${remaining > 1 ? 's' : ''} to fill the room...`;
+      }
     }
   });
     }
@@ -316,6 +369,7 @@
         document.getElementById('display-payout').innerText = `${bank} - ${accNum} (${accName})`;
         document.getElementById('display-group').innerText = assignedGroup;
         listenForGroupRoom(assignedGroup);
+        listenForGroupPlayerCount(assignedGroup);
     
        },
       onClose: function() {
