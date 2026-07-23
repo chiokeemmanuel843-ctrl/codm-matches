@@ -164,7 +164,9 @@
         <p class="text-gray-400">Selected Mode: <span id="display-mode" class="text-yellow-400 font-bold"></span></p>
         <p class="text-gray-400">Player IGN: <span id="display-ign" class="text-white font-bold"></span></p>
         <p class="text-gray-400">Payout Account: <span id="display-payout" class="text-green-400 font-mono"></span></p>
-      </div>
+        <p class="text-gray-400">Assigned Group: <span id="display-group" class="text-yellow-400 font-bold">Group 1</span></p>
+        </div>
+    
 
       <!-- CODM CREDENTIALS BOX -->
       <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
@@ -249,47 +251,73 @@
     }
 
     function handlePayment(e) {
-      e.preventDefault();
-      
-      const ign = document.getElementById('ign').value.trim();
-      const uid = document.getElementById('uid').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const bank = document.getElementById('bank-name').value;
-      const accNum = document.getElementById('account-number').value.trim();
-      const accName = document.getElementById('account-name').value.trim();
+  e.preventDefault();
 
-      let handler = PaystackPop.setup({
-        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36',
-        email: email,
-        amount: currentFee * 100,
-        currency: "NGN",
-        ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
-        metadata: {
-          custom_fields: [
-            { display_name: "Match Mode", variable_name: "match_mode", value: selectedMatchMode },
-            { display_name: "IGN", variable_name: "ign", value: ign },
-            { display_name: "CODM UID", variable_name: "uid", value: uid },
-            { display_name: "Payout Bank", variable_name: "payout_bank", value: bank },
-            { display_name: "Account Number", variable_name: "account_number", value: accNum },
-            { display_name: "Account Name", variable_name: "account_name", value: accName }
-          ]
-        },
-        callback: function(response) {
-          // Hide registration form and show waiting lobby
-          document.getElementById('match-form').classList.add('hidden');
-          document.getElementById('waiting-room').classList.remove('hidden');
-          
-          document.getElementById('display-mode').innerText = selectedMatchMode;
-          document.getElementById('display-ign').innerText = ign;
-          document.getElementById('display-payout').innerText = `${accNum} (${bank}) - ${accName}`;
-        },
-        onClose: function() {
-          alert('Transaction was not completed.');
-        }
-      });
-      
-      handler.openIframe();
-    }
+  const ign = document.getElementById('ign').value.trim();
+  const uid = document.getElementById('uid').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const bank = document.getElementById('bank-name').value;
+  const accNum = document.getElementById('account-number').value.trim();
+  const accName = document.getElementById('account-name').value.trim();
+
+  // 1. Fetch current players to assign Group number (8 players per group)
+  firebase.database().ref('players').once('value').then((snapshot) => {
+    const players = snapshot.val() || {};
+    const totalPlayers = Object.keys(players).length;
+
+    const groupNumber = Math.floor(totalPlayers / 8) + 1;
+    const assignedGroup = "Group " + groupNumber;
+
+    // 2. Setup Paystack Payment
+    let handler = PaystackPop.setup({
+      key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36',
+      email: email,
+      amount: currentFee * 100,
+      currency: "NGN",
+      ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
+      metadata: {
+        custom_fields: [
+          { display_name: "Match Mode", variable_name: "match_mode", value: selectedMatchMode },
+          { display_name: "IGN", variable_name: "ign", value: ign },
+          { display_name: "CODM UID", variable_name: "uid", value: uid },
+          { display_name: "Payout Bank", variable_name: "payout_bank", value: bank },
+          { display_name: "Account Number", variable_name: "account_number", value: accNum },
+          { display_name: "Account Name", variable_name: "account_name", value: accName },
+          { display_name: "Group", variable_name: "group", value: assignedGroup }
+        ]
+      },
+      callback: function(response) {
+        // 3. Save player data to Firebase
+        firebase.database().ref('players/' + response.reference).set({
+          ign: ign,
+          uid: uid,
+          email: email,
+          bank: bank,
+          accountNumber: accNum,
+          accountName: accName,
+          mode: selectedMatchMode,
+          group: assignedGroup,
+          timestamp: Date.now()
+        });
+
+        // 4. Reveal waiting room UI
+        document.getElementById('match-form').classList.add('hidden');
+        document.getElementById('waiting-room').classList.remove('hidden');
+
+        document.getElementById('display-mode').innerText = selectedMatchMode;
+        document.getElementById('display-ign').innerText = ign;
+        document.getElementById('display-payout').innerText = `${bank} - ${accNum} (${accName})`;
+        document.getElementById('display-group').innerText = assignedGroup;
+      },
+      onClose: function() {
+        alert('Transaction was not completed.');
+      }
+    });
+
+    handler.openIframe();
+  });
+          }
+    
   </script>
 </body>
 </html>
