@@ -7,6 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Paystack Inline JS -->
   <script src="https://js.paystack.co/v1/inline.js"></script>
+
+  <!-- Firebase App (Compat) & Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-4">
 
@@ -27,7 +31,7 @@
     </div>
 
     <!-- REGISTRATION FORM -->
-    <form id="match-form" button="handlePayment(event)" class="space-y-5">
+    <form id="match-form" onsubmit="handlePayment(event)" class="space-y-5">
       
       <!-- 1. MATCH MODE SELECTOR -->
       <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3">
@@ -136,7 +140,7 @@
         </div>
       </div>
 
-      <button type="button" id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3.5 rounded-xl transition shadow-lg shadow-yellow-500/10">
+      <button type="submit" id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3.5 rounded-xl transition shadow-lg shadow-yellow-500/10">
         Pay ₦1,000 & Join Match
       </button>
     </form>
@@ -154,15 +158,46 @@
         <p class="text-gray-400">Payout Account: <span id="display-payout" class="text-green-400 font-mono"></span></p>
       </div>
 
+      <!-- CODM CREDENTIALS BOX (DIRECT MATCH TO YOUR DESIGN) -->
       <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
         <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
-        <p class="text-sm text-yellow-400 font-mono animate-pulse">Waiting for host to post Room ID & Password...</p>
+        
+        <div id="room-credentials-display">
+          <p class="text-sm text-yellow-400 font-mono animate-pulse">Waiting for host to post Room ID & Password...</p>
+        </div>
       </div>
     </div>
 
   </div>
 
   <script>
+    // =======================================================
+    // ⚙️ FIREBASE INITIALIZATION
+    // Replace with your keys from Firebase Console Project Settings
+    // =======================================================
+    const firebaseConfig = {
+      databaseURL: "https://codm-tournaments-default-rtdb.firebaseio.com" // Update if your RTDB URL differs
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // =======================================================
+    // 📡 REALTIME CREDENTIALS LISTENER
+    // =======================================================
+    firebase.database().ref('current_room').on('value', (snapshot) => {
+      const data = snapshot.val();
+      const displayArea = document.getElementById('room-credentials-display');
+
+      if (data && data.roomId && data.password) {
+        displayArea.innerHTML = `
+          <div class="space-y-1 mt-1">
+            <p class="text-xs font-bold text-green-400 uppercase tracking-wide mb-2">● Room Created</p>
+            <p class="text-yellow-400 font-mono text-base">Room ID: <span class="font-bold text-white select-all">${data.roomId}</span></p>
+            <p class="text-yellow-400 font-mono text-base">Password: <span class="font-bold text-white select-all">${data.password}</span></p>
+          </div>
+        `;
+      }
+    });
+
     // =======================================================
     // ⚙️ HOST MATCH CONTROLLER (Turn modes ON or OFF here!)
     // =======================================================
@@ -217,9 +252,9 @@
       const accName = document.getElementById('account-name').value.trim();
 
       let handler = PaystackPop.setup({
-        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36', // Plugs in your Paystack key directly
+        key: 'pk_test_5a8bd4dcc8f233f4b69be0bf0acf330258189a36',
         email: email,
-        amount: currentFee * 100, // Converts Naira to Kobo
+        amount: currentFee * 100,
         currency: "NGN",
         ref: 'CODM_' + Math.floor((Math.random() * 1000000000) + 1),
         metadata: {
@@ -248,44 +283,7 @@
       
       handler.openIframe();
     }
-  <!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<!-- Firebase Realtime Database SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-<script>
-  // 1. Firebase Configuration
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY", // Replace with your actual key if you have one
-    authDomain: "codm-tournaments-f4ed4.firebaseapp.com",
-    databaseURL: "https://codm-tournaments-f4ed4-default-rtdb.firebaseio.com",
-    projectId: "codm-tournaments-f4ed4"
-  };
-
-  // 2. Initialize Firebase
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-
-  // 3. Connect to current_room
-  const db = firebase.database();
-  const roomRef = db.ref('current_room');
-
-  // 4. Listen for real-time updates
-  roomRef.on('value', (snapshot) => {
-    const data = snapshot.val();
-    console.log("Data from Firebase:", data);
-
-    if (data && data.roomId && data.password) {
-      // Find elements on your page and update their text
-      const roomIdEl = document.getElementById('roomIdDisplay');
-      const passwordEl = document.getElementById('passwordDisplay');
-
-      if (roomIdEl) roomIdEl.innerText = data.roomId;
-      if (passwordEl) passwordEl.innerText = data.password;
-    }
-  });
-</script>
-</script>
+  </script>
 </body>
-        </html>
+</html>
+
