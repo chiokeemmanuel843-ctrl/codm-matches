@@ -188,18 +188,27 @@
   </p>
 </div>
       
-      <!-- CODM CREDENTIALS BOX -->
-      <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
-        <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
-        
-        <div id="room-credentials-display">
-          <p class="text-sm text-yellow-400 font-mono animate-pulse">Waiting for host to post Room ID & Password...</p>
-        </div>
+       <!-- CODM CREDENTIALS BOX -->
+    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
+      <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">CODM Private Room Credentials</p>
+
+      <div id="room-credentials-display">
+        <p class="text-sm text-yellow-400 font-mono animate-pulse">Waiting for host to post Room ID & Password...</p>
+      </div>
+
+      <!-- Leave Room Button -->
+      <div class="mt-4">
+        <button 
+          type="button"
+          onclick="leaveWaitingRoom()" 
+          class="w-full py-2.5 px-4 bg-red-600/20 hover:bg-red-600/30 border border-red-500/50 text-red-400 font-semibold rounded-xl text-sm transition-all duration-200 flex items-center justify-center gap-2">
+          <span>🚪</span> Leave Room / Register Again
+        </button>
       </div>
     </div>
 
-  </div>
 
+      
   <script>
     // =======================================================
     // ⚙️ FIREBASE INITIALIZATION
@@ -404,6 +413,16 @@
     handler.openIframe();
   });
           }
+    // Leave Room Function
+function leaveWaitingRoom() {
+  if (confirm("Are you sure you want to leave this match room?")) {
+    localStorage.removeItem('assignedGroup');
+    localStorage.removeItem('playerIgn');
+    localStorage.removeItem('selectedMode');
+    location.reload();
+  }
+}
+    
     
   </script>
 </body>
