@@ -240,12 +240,12 @@
 
     snapshot.forEach((childSnapshot) => {
       const playerData = childSnapshot.val();
-      if (playerData && playerData.assignedGroup === assignedGroup) {
+      if (playerData && playerData.group === assignedGroup) {
         groupPlayerCount++;
       }
     });
 
-    const countText = document.getElementById('player-count-text');
+    const countText = document.getElementById('group-progress-text');
     const progressBar = document.getElementById('player-progress-bar');
     const statusMsg = document.getElementById('group-status-msg');
 
